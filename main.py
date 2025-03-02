@@ -1,37 +1,35 @@
 import os
+import sys
 
-path_to_file = os.path.join(os.path.dirname(__file__), 'books', 'frankenstein.txt')
+from stats import count_words, count_letters
 
-def count_words(text: str) -> int:
-    return len(text.split())
+ROOT = os.path.dirname(__file__)
 
-def count_letters(text: str) -> dict[str, int]:
-    letters = {}
-    for letter in text.lower():
-        if not letter.isalpha():
-            continue
+_, *args = sys.argv
 
-        if letter in letters:
-            letters[letter] += 1
-        else:
-            letters[letter] = 1
-    return letters
+def main(path: str):
+    print('=' * 10, 'BOOKBOOT', '=' * 10)
 
-def print_report(words: int, letters: dict[str, int]) -> None:
+    print(f'Analyzing book found at {path}...')
+    print('-' * 10, 'Word Count', '-' * 10)
 
-    print('-- REPORT START --')
+    with open(path) as f:
+        text = f.read()
 
-    print("words:", words)
-    print("letters:")
-    for letter, count in sorted(letters.items()):
-        print(f"{letter}: {count}")
+        words = count_words(text)
+        print(f'Found {words} total words')
 
-    print('-- REPORT END --')
+        print('-' * 10, 'Character Count', '-' * 10)
+        letters = count_letters(text)
+        for letter, count in sorted(letters.items()):
+            print(f'{letter}: {count}')
 
-with open(path_to_file, 'r') as f:
-    text = f.read()
+    print('=' * 10, 'END', '=' * 10)
 
-    words = count_words(text)
-    letters = count_letters(text)
 
-    print_report(words, letters)
+if __name__ == '__main__':
+    if len(sys.argv) != 2:
+        print('Usage: python3 main.py <path_to_book>', file=sys.stderr)
+        sys.exit(1)
+    main(sys.argv[1])
+
